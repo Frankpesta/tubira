@@ -31,5 +31,5 @@ export const PLANS = {
   },
 } as const;
 
-export const TUBIRA_URL = "https://tubira.com";
+export const TUBIRA_URL = "https://tubira.ai";
 

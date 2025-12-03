@@ -2,6 +2,7 @@
 
 import { useQuery, useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
+import { Doc } from "@/convex/_generated/dataModel";
 import { AdminLayout } from "@/components/admin/layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -42,7 +43,7 @@ export default function AffiliatesPage() {
 
     const csv = [
       ["Name", "Email", "Phone", "Company", "Plan", "Status", "Amount", "Created At"],
-      ...affiliates.map((a) => [
+      ...affiliates.map((a: Doc<"affiliates">) => [
         a.name,
         a.email,
         a.phone || "",
@@ -53,15 +54,15 @@ export default function AffiliatesPage() {
         format(new Date(a.createdAt), "yyyy-MM-dd HH:mm:ss"),
       ]),
     ]
-      .map((row) => row.map((cell) => `"${cell}"`).join(","))
+      .map((row) => row.map((cell: string | undefined) => `"${cell ?? ""}"`).join(","))
       .join("\n");
 
     const blob = new Blob([csv], { type: "text/csv" });
     const url = window.URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `affiliates-${format(new Date(), "yyyy-MM-dd")}.csv`;
-    a.click();
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `affiliates-${format(new Date(), "yyyy-MM-dd")}.csv`;
+    link.click();
     window.URL.revokeObjectURL(url);
     toast.success("Data exported successfully");
   };
@@ -127,7 +128,7 @@ export default function AffiliatesPage() {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {affiliates.map((affiliate) => (
+                      {affiliates.map((affiliate: Doc<"affiliates">) => (
                         <TableRow key={affiliate._id} className="hover:bg-gray-50 transition-colors">
                           <TableCell className="font-semibold text-xs lg:text-sm" style={{ fontFamily: 'var(--font-manrope), sans-serif' }}>
                             <div>

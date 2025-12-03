@@ -2,6 +2,7 @@
 
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
+import { Doc } from "@/convex/_generated/dataModel";
 import { AdminLayout } from "@/components/admin/layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -29,7 +30,7 @@ export default function PaymentsPage() {
 
     const csv = [
       ["Payment ID", "Amount", "Currency", "Plan", "Status", "Created At"],
-      ...payments.map((p) => [
+      ...payments.map((p: Doc<"payments">) => [
         p.stripePaymentIntentId,
         `$${(p.amount / 100).toFixed(2)}`,
         p.currency.toUpperCase(),
@@ -38,15 +39,15 @@ export default function PaymentsPage() {
         format(new Date(p.createdAt), "yyyy-MM-dd HH:mm:ss"),
       ]),
     ]
-      .map((row) => row.map((cell) => `"${cell}"`).join(","))
+      .map((row) => row.map((cell: string | undefined) => `"${cell ?? ""}"`).join(","))
       .join("\n");
 
     const blob = new Blob([csv], { type: "text/csv" });
     const url = window.URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `payments-${format(new Date(), "yyyy-MM-dd")}.csv`;
-    a.click();
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `payments-${format(new Date(), "yyyy-MM-dd")}.csv`;
+    link.click();
     window.URL.revokeObjectURL(url);
     toast.success("Data exported successfully");
   };
@@ -156,7 +157,7 @@ export default function PaymentsPage() {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {payments.map((payment) => (
+                      {payments.map((payment: Doc<"payments">) => (
                         <TableRow key={payment._id} className="hover:bg-gray-50 transition-colors">
                           <TableCell className="font-mono text-xs lg:text-sm hidden lg:table-cell break-all" style={{ fontFamily: 'var(--font-manrope), sans-serif' }}>
                             {payment.stripePaymentIntentId || payment.stripeCheckoutSessionId || "-"}

@@ -2,6 +2,7 @@
 
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
+import { Doc } from "@/convex/_generated/dataModel";
 import { AdminLayout } from "@/components/admin/layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -28,22 +29,22 @@ export default function ActivitiesPage() {
 
     const csv = [
       ["Type", "Description", "Amount", "Created At"],
-      ...activities.map((a) => [
+      ...activities.map((a: Doc<"activities">) => [
         a.type,
         a.description,
         a.amount ? `$${(a.amount / 100).toFixed(2)}` : "",
         format(new Date(a.createdAt), "yyyy-MM-dd HH:mm:ss"),
       ]),
     ]
-      .map((row) => row.map((cell) => `"${cell}"`).join(","))
+      .map((row) => row.map((cell: string | undefined) => `"${cell ?? ""}"`).join(","))
       .join("\n");
 
     const blob = new Blob([csv], { type: "text/csv" });
     const url = window.URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `activities-${format(new Date(), "yyyy-MM-dd")}.csv`;
-    a.click();
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `activities-${format(new Date(), "yyyy-MM-dd")}.csv`;
+    link.click();
     window.URL.revokeObjectURL(url);
     toast.success("Data exported successfully");
   };
@@ -105,7 +106,7 @@ export default function ActivitiesPage() {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {activities.map((activity) => (
+                      {activities.map((activity: Doc<"activities">) => (
                         <TableRow key={activity._id} className="hover:bg-gray-50 transition-colors">
                           <TableCell>
                             <span className={`px-2 lg:px-3 py-1 rounded-full text-xs font-semibold capitalize ${

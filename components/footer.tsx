@@ -18,12 +18,12 @@ export function Footer() {
             </p>
             <div className="flex space-x-4">
               <a
-                href="https://tubira.com"
+                href="https://tubira.ai"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-gray-400 hover:text-white transition-colors"
               >
-                Visit Tubira.com
+                Visit Tubira.ai
               </a>
             </div>
           </div>
@@ -62,10 +62,10 @@ export function Footer() {
               <li className="flex items-center space-x-2">
                 <Mail className="h-4 w-4 text-gray-400" />
                 <a
-                  href="mailto:partner@tubira.com"
+                  href="mailto:partner@tubira.ai"
                   className="text-gray-400 hover:text-white transition-colors"
                 >
-                  partner@tubira.com
+                  partner@tubira.ai
                 </a>
               </li>
               <li className="flex items-center space-x-2">

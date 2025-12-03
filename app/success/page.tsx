@@ -46,7 +46,7 @@ export default function SuccessPage() {
             </p>
           )}
           <p className="text-center text-gray-700" style={{ fontFamily: 'var(--font-manrope), sans-serif' }}>
-            You will be redirected to Tubira.com in {countdown} seconds...
+            You will be redirected to Tubira.ai in {countdown} seconds...
           </p>
           <div className="flex flex-col gap-2">
             <Button 
@@ -55,7 +55,7 @@ export default function SuccessPage() {
               size="lg"
               style={{ fontFamily: 'var(--font-manrope), sans-serif' }}
             >
-              <Link href={TUBIRA_URL}>Go to Tubira.com Now</Link>
+              <Link href={TUBIRA_URL}>Go to Tubira.ai Now</Link>
             </Button>
             <Button 
               asChild 

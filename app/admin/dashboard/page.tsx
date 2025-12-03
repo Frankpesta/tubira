@@ -2,6 +2,7 @@
 
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
+import { Doc } from "@/convex/_generated/dataModel";
 import { AdminLayout } from "@/components/admin/layout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Users, DollarSign, TrendingUp, CheckCircle } from "lucide-react";
@@ -11,8 +12,8 @@ export default function AdminDashboard() {
   const stats = useQuery(api.payments.getStats);
 
   const totalAffiliates = affiliates?.length || 0;
-  const paidAffiliates = affiliates?.filter((a) => a.status === "paid").length || 0;
-  const pendingAffiliates = affiliates?.filter((a) => a.status === "pending").length || 0;
+  const paidAffiliates = affiliates?.filter((a: Doc<"affiliates">) => a.status === "paid").length || 0;
+  const pendingAffiliates = affiliates?.filter((a: Doc<"affiliates">) => a.status === "pending").length || 0;
 
   const formatCurrency = (cents: number) => {
     return new Intl.NumberFormat("en-US", {
@@ -116,7 +117,7 @@ export default function AdminDashboard() {
             <div className="space-y-3 lg:space-y-4">
               {affiliates && affiliates.length > 0 ? (
                 <div className="space-y-2 lg:space-y-3">
-                  {affiliates.slice(0, 5).map((affiliate) => (
+                  {affiliates.slice(0, 5).map((affiliate: Doc<"affiliates">) => (
                     <div
                       key={affiliate._id}
                       className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4 p-3 lg:p-4 border-2 rounded-lg hover:shadow-md transition-shadow bg-white"

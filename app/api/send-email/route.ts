@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
     }
 
     const { data, error } = await resend.emails.send({
-      from: process.env.RESEND_FROM_EMAIL || "Tubira <noreply@tubira.com>",
+      from: process.env.RESEND_FROM_EMAIL || "Tubira <noreply@tubira.ai>",
       to: [to],
       subject: "Welcome to Tubira Affiliate Program!",
       react: AffiliateWelcomeEmail({

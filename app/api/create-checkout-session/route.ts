@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const planDetails = PLANS[plan];
+    const planDetails = PLANS[plan as keyof typeof PLANS];
     const amount = planDetails.price;
 
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
