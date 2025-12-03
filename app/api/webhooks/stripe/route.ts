@@ -43,7 +43,7 @@ export async function POST(request: NextRequest) {
       const plan = session.metadata?.plan;
       const amount = session.amount_total;
 
-      if (affiliateId && email && plan) {
+      if (affiliateId && email && plan && amount !== null && amount !== undefined) {
         try {
           await fetch(`${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/api/send-email`, {
             method: "POST",
