@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { stripe } from "@/lib/stripe";
 import { ConvexHttpClient } from "convex/browser";
-import { internal } from "@/convex/_generated/api";
+import { api } from "@/convex/_generated/api";
 
 const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    await convex.mutation(internal.webhooks.handleStripeWebhook, {
+    await convex.action(api.webhooks.handleStripeWebhook, {
       type: event.type,
       data: event.data,
     });

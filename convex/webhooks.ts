@@ -1,7 +1,9 @@
-import { internalMutation } from "./_generated/server";
+import { action, internalMutation } from "./_generated/server";
+import { internal } from "./_generated/api";
 import { v } from "convex/values";
 
-export const handleStripeWebhook = internalMutation({
+// Internal mutation for database operations (called by action)
+export const handleStripeWebhookInternal = internalMutation({
   args: {
     type: v.string(),
     data: v.any(),
@@ -169,16 +171,33 @@ export const handleStripeWebhook = internalMutation({
         });
 
         // Create activity log
-        await ctx.db.insert("activities", {
-          affiliateId: payment.affiliateId,
-          type: "refund",
-          description: `Refund processed: $${(charge.amount_refunded / 100).toFixed(2)}`,
-          amount: -charge.amount_refunded,
-          createdAt: Date.now(),
-        });
+        if (payment.affiliateId) {
+          await ctx.db.insert("activities", {
+            affiliateId: payment.affiliateId,
+            type: "refund",
+            description: `Refund processed: $${(charge.amount_refunded / 100).toFixed(2)}`,
+            amount: -charge.amount_refunded,
+            createdAt: Date.now(),
+          });
+        }
       }
     }
 
     return { success: true };
+  },
+});
+
+// Public action wrapper that can be called from webhooks
+export const handleStripeWebhook = action({
+  args: {
+    type: v.string(),
+    data: v.any(),
+  },
+  handler: async (ctx, args): Promise<{ success: boolean }> => {
+    // Call the internal mutation
+    return await ctx.runMutation(internal.webhooks.handleStripeWebhookInternal, {
+      type: args.type,
+      data: args.data,
+    });
   },
 });
