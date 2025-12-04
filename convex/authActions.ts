@@ -3,6 +3,7 @@
 import { v } from "convex/values";
 import { action, internalAction } from "./_generated/server";
 import { internal } from "./_generated/api";
+import { Id } from "./_generated/dataModel";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
@@ -15,7 +16,7 @@ export const createAdmin = action({
     password: v.string(),
     name: v.string(),
   },
-  handler: async (ctx, args) => {
+  handler: async (ctx, args): Promise<Id<"admins">> => {
     // Check if admin already exists
     const existing = await ctx.runQuery(internal.auth.checkAdminExists, {
       email: args.email,
@@ -26,10 +27,10 @@ export const createAdmin = action({
     }
 
     // Hash password using Node.js
-    const passwordHash = await bcrypt.hash(args.password, 10);
+    const passwordHash: string = await bcrypt.hash(args.password, 10);
 
     // Call internal mutation to create admin
-    const adminId = await ctx.runMutation(internal.auth.createAdminInternal, {
+    const adminId: Id<"admins"> = await ctx.runMutation(internal.auth.createAdminInternal, {
       email: args.email,
       passwordHash,
       name: args.name,
@@ -45,7 +46,7 @@ export const login = action({
     email: v.string(),
     password: v.string(),
   },
-  handler: async (ctx, args) => {
+  handler: async (ctx, args): Promise<{ token: string; admin: { id: string; email: string; name: string } }> => {
     const admin = await ctx.runQuery(internal.auth.getAdminByEmailInternal, {
       email: args.email,
     });
@@ -87,7 +88,7 @@ export const login = action({
 // Action for creating password reset token
 export const createPasswordResetToken = action({
   args: { email: v.string() },
-  handler: async (ctx, args) => {
+  handler: async (ctx, args): Promise<string | null> => {
     const admin = await ctx.runQuery(internal.auth.getAdminByEmailInternal, {
       email: args.email,
     });
@@ -119,7 +120,7 @@ export const resetPassword = action({
     token: v.string(),
     newPassword: v.string(),
   },
-  handler: async (ctx, args) => {
+  handler: async (ctx, args): Promise<boolean> => {
     try {
       // Verify token using Node.js
       const decoded = jwt.verify(args.token, JWT_SECRET) as {
