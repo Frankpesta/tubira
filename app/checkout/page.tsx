@@ -1,15 +1,15 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { PLANS } from "@/lib/constants";
 import { toast } from "sonner";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
-export default function CheckoutPage() {
+function CheckoutContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const plan = (searchParams.get("plan") as "standard" | "premium") || "standard";
+  const plan = (searchParams.get("plan") as "standard" | "standard" | "premium") || "standard";
 
   useEffect(() => {
     // Get form data from sessionStorage
@@ -91,5 +91,33 @@ export default function CheckoutPage() {
         </Card>
       </div>
     </div>
+  );
+}
+
+export default function CheckoutPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white py-12 px-4">
+        <div className="container mx-auto max-w-2xl">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-3xl text-center" style={{ fontFamily: 'var(--font-manrope), sans-serif' }}>
+                Loading...
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-center py-8">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+                <p className="text-gray-600" style={{ fontFamily: 'var(--font-manrope), sans-serif' }}>
+                  Please wait...
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    }>
+      <CheckoutContent />
+    </Suspense>
   );
 }

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
+import { Suspense } from "react";
 import { useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Button } from "@/components/ui/button";
@@ -14,7 +15,7 @@ import { toast } from "sonner";
 import Link from "next/link";
 import Image from "next/image";
 
-export default function RegisterPage() {
+function RegisterContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const planParam = searchParams.get("plan") as "standard" | "premium" | null;
@@ -268,5 +269,24 @@ export default function RegisterPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function RegisterPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white py-12 px-4">
+        <div className="container mx-auto max-w-4xl">
+          <div className="text-center py-8">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+            <p className="text-gray-600" style={{ fontFamily: 'var(--font-manrope), sans-serif' }}>
+              Loading...
+            </p>
+          </div>
+        </div>
+      </div>
+    }>
+      <RegisterContent />
+    </Suspense>
   );
 }
