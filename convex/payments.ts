@@ -67,7 +67,7 @@ export const updateStatus = mutation({
     });
 
     // Update affiliate status if payment succeeded
-    if (args.status === "succeeded") {
+    if (args.status === "succeeded" && payment.affiliateId) {
       await ctx.db.patch(payment.affiliateId, {
         status: "paid",
         updatedAt: Date.now(),
