@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { Mail, Phone } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 export function Footer() {
   return (
@@ -17,14 +18,19 @@ export function Footer() {
               Empowering travelers worldwide with seamless, secure, and flexible booking experiences while providing our partners with a transparent and profitable affiliate platform.
             </p>
             <div className="flex space-x-4">
-              <a
-                href="https://tubira.ai"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-gray-400 hover:text-white transition-colors"
+              <Button
+                asChild
+                variant="outline"
+                className="border-gray-600 text-gray-300 hover:bg-gray-700 hover:text-white"
               >
-                Visit Tubira.ai
-              </a>
+                <a
+                  href="https://tubira.ai"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Visit Tubira.ai
+                </a>
+              </Button>
             </div>
           </div>
 

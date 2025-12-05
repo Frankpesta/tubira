@@ -5,9 +5,11 @@ export default defineSchema({
   affiliates: defineTable({
     email: v.string(),
     name: v.string(),
-    phone: v.optional(v.string()),
+    phone: v.string(),
     company: v.optional(v.string()),
     website: v.optional(v.string()),
+    country: v.string(),
+    address: v.string(),
     plan: v.union(v.literal("standard"), v.literal("premium")),
     planPrice: v.number(), // in cents
     status: v.union(

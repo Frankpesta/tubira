@@ -37,6 +37,8 @@ function CheckoutContent() {
               phone: formData.phone,
               company: formData.company,
               website: formData.website,
+              country: formData.country,
+              address: formData.address,
             }
           }),
         });

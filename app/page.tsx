@@ -110,12 +110,11 @@ export default function Home() {
         {/* Background Image with Overlay */}
         <div className="absolute inset-0 z-0">
           <Image
-            src="https://images.unsplash.com/photo-1488646953014-85cb44e25828?q=80&w=2070&auto=format&fit=crop"
+            src="/p1.jpg"
             alt="Travel Hero"
             fill
             className="object-cover"
             priority
-            quality={90}
           />
           <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-black/70"></div>
           <div className="absolute inset-0 bg-gradient-to-r from-blue-900/40 via-purple-900/40 to-pink-900/40"></div>
@@ -215,7 +214,7 @@ export default function Home() {
               At Tubira, we believe that travel should be effortless, accessible, and rewarding. Our platform unifies multiple travel products in one checkout, giving travelers the convenience of booking flights, accommodations, activities, and eSIM data plans without juggling multiple platforms.
             </p>
             <p className="text-lg text-gray-600 leading-relaxed" style={{ fontFamily: 'var(--font-manrope), sans-serif' }}>
-              We operate globally, with strong coverage in USA, Canada, Mexico, Nigeria, and the UK, and growing presence across Africa, Europe, and North America.
+              We operate globally, with strong coverage in USA, Canada, Mexico, and the UK, and growing presence across Africa, Europe, Asia, Middle East, and North America.
             </p>
           </div>
 
@@ -226,19 +225,19 @@ export default function Home() {
                 icon: Globe, 
                 title: "Global Reach", 
                 desc: "Connecting travelers and affiliates across borders",
-                image: "https://images.unsplash.com/photo-1488646953014-85cb44e25828?q=80&w=2070&auto=format&fit=crop"
+                image: "/p2.jpg"
               },
               { 
                 icon: Shield, 
                 title: "Integrity", 
                 desc: "Transparent practices for travelers and affiliates alike",
-                image: "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?q=80&w=2021&auto=format&fit=crop"
+                image: "/p3.jpg"
               },
               { 
                 icon: TrendingUp, 
                 title: "Innovation", 
                 desc: "Constantly improving booking experience and affiliate tools",
-                image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=2073&auto=format&fit=crop"
+                image: "/p4.jpg"
               },
             ].map((value, i) => (
               <AceternityCard key={i} className="h-[400px]">
@@ -342,7 +341,7 @@ export default function Home() {
             {/* Standard Plan */}
             <AceternityCard className="h-[600px] border-2 hover:border-blue-500 transition-all shadow-xl animate-on-scroll">
               <CardImage 
-                src="https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?q=80&w=2021&auto=format&fit=crop" 
+                src="/p4.jpg" 
                 alt="Standard Plan"
               />
               <CardBody className="absolute bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md rounded-b-xl p-6">
@@ -353,6 +352,9 @@ export default function Home() {
                       {PLANS.standard.priceDisplay}
                     </div>
                   </div>
+                  <p className="text-xs text-gray-500 mb-2 font-semibold" style={{ fontFamily: 'var(--font-manrope), sans-serif' }}>
+                    One-time payment
+                  </p>
                   <CardDescription className="text-base mb-4" style={{ fontFamily: 'var(--font-manrope), sans-serif' }}>
                     Ideal for creators and small agencies starting their affiliate journey
                   </CardDescription>
@@ -393,7 +395,7 @@ export default function Home() {
               </div>
               <AceternityCard className="h-[600px] border-2 border-purple-500 shadow-2xl animate-on-scroll md:scale-105">
                 <CardImage 
-                src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=2073&auto=format&fit=crop" 
+                src="/p5.jpg" 
                 alt="Premium Plan"
               />
               <CardBody className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-white via-white/98 to-white/95 backdrop-blur-md rounded-b-xl p-6">
@@ -404,6 +406,9 @@ export default function Home() {
                       {PLANS.premium.priceDisplay}
                     </div>
                   </div>
+                  <p className="text-xs text-gray-500 mb-2 font-semibold" style={{ fontFamily: 'var(--font-manrope), sans-serif' }}>
+                    One-time payment
+                  </p>
                   <CardDescription className="text-sm sm:text-base mb-4" style={{ fontFamily: 'var(--font-manrope), sans-serif' }}>
                     Perfect for high-volume affiliates who want access to all travel products
                   </CardDescription>
@@ -480,7 +485,7 @@ export default function Home() {
       <section className="py-24 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 relative overflow-hidden">
         <div className="absolute inset-0">
           <Image
-            src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?q=80&w=2070&auto=format&fit=crop"
+            src="/p1.jpg"
             alt="CTA Background"
             fill
             className="object-cover opacity-20"

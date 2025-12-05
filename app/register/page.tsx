@@ -9,7 +9,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { PLANS } from "@/lib/constants";
+import { COUNTRIES } from "@/lib/countries";
 import { Check, ArrowRight, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 import Link from "next/link";
@@ -29,6 +31,8 @@ function RegisterContent() {
     phone: "",
     company: "",
     website: "",
+    country: "",
+    address: "",
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -36,7 +40,7 @@ function RegisterContent() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.name || !formData.email) {
+    if (!formData.name || !formData.email || !formData.phone) {
       toast.error("Please fill in all required fields");
       return;
     }
@@ -119,14 +123,52 @@ function RegisterContent() {
 
                 <div className="space-y-2">
                   <Label htmlFor="phone" className="text-sm font-semibold" style={{ fontFamily: 'var(--font-manrope), sans-serif' }}>
-                    Phone Number
+                    Phone Number *
                   </Label>
                   <Input
                     id="phone"
                     type="tel"
+                    required
                     value={formData.phone}
                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                     placeholder="+1 (555) 123-4567"
+                    className="h-12 rounded-lg border-2 focus:border-blue-500"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="country" className="text-sm font-semibold" style={{ fontFamily: 'var(--font-manrope), sans-serif' }}>
+                    Country *
+                  </Label>
+                  <Select
+                    value={formData.country}
+                    onValueChange={(value) => setFormData({ ...formData, country: value })}
+                    required
+                  >
+                    <SelectTrigger className="h-12 rounded-lg border-2 focus:border-blue-500 bg-white">
+                      <SelectValue placeholder="Select your country" />
+                    </SelectTrigger>
+                    <SelectContent className="max-h-[300px] bg-white">
+                      {COUNTRIES.map((country) => (
+                        <SelectItem key={country} value={country}>
+                          {country}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="address" className="text-sm font-semibold" style={{ fontFamily: 'var(--font-manrope), sans-serif' }}>
+                    Address *
+                  </Label>
+                  <Input
+                    id="address"
+                    type="text"
+                    required
+                    value={formData.address}
+                    onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                    placeholder="Street address, City, State/Province"
                     className="h-12 rounded-lg border-2 focus:border-blue-500"
                   />
                 </div>
@@ -159,6 +201,9 @@ function RegisterContent() {
                   />
                 </div>
 
+                <p className="text-xs text-gray-500 text-center mb-2" style={{ fontFamily: 'var(--font-manrope), sans-serif' }}>
+                  * One-time payment
+                </p>
                 <Button 
                   type="submit" 
                   disabled={isSubmitting}
@@ -177,8 +222,8 @@ function RegisterContent() {
               <div className="relative h-48">
                 <Image
                   src={selectedPlan === "premium" 
-                    ? "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=2073&auto=format&fit=crop"
-                    : "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?q=80&w=2021&auto=format&fit=crop"
+                    ? "/p5.jpg"
+                    : "/p4.jpg"
                   }
                   alt={selectedPlan === "premium" ? "Premium Plan" : "Standard Plan"}
                   fill
@@ -191,6 +236,9 @@ function RegisterContent() {
                   </h3>
                   <p className="text-3xl font-bold text-white" style={{ fontFamily: 'var(--font-manrope), sans-serif' }}>
                     {PLANS[selectedPlan].priceDisplay}
+                  </p>
+                  <p className="text-xs text-white/80 font-semibold mt-1" style={{ fontFamily: 'var(--font-manrope), sans-serif' }}>
+                    One-time payment
                   </p>
                 </div>
               </div>
@@ -243,6 +291,9 @@ function RegisterContent() {
                 <div className="text-lg font-bold text-gray-900" style={{ fontFamily: 'var(--font-manrope), sans-serif' }}>
                   {PLANS.standard.priceDisplay}
                 </div>
+                <div className="text-xs text-gray-500 font-semibold" style={{ fontFamily: 'var(--font-manrope), sans-serif' }}>
+                  One-time
+                </div>
               </button>
               <button
                 onClick={() => setSelectedPlan("premium")}
@@ -262,6 +313,9 @@ function RegisterContent() {
                 </div>
                 <div className="text-lg font-bold text-gray-900" style={{ fontFamily: 'var(--font-manrope), sans-serif' }}>
                   {PLANS.premium.priceDisplay}
+                </div>
+                <div className="text-xs text-gray-500 font-semibold" style={{ fontFamily: 'var(--font-manrope), sans-serif' }}>
+                  One-time
                 </div>
               </button>
             </div>

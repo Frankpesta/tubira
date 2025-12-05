@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (!formData.name || !formData.email) {
+    if (!formData.name || !formData.email || !formData.phone || !formData.country || !formData.address) {
       return NextResponse.json(
         { error: "Missing required fields" },
         { status: 400 }
@@ -56,6 +56,8 @@ export async function POST(request: NextRequest) {
         phone: formData.phone || "",
         company: formData.company || "",
         website: formData.website || "",
+        country: formData.country || "",
+        address: formData.address || "",
         planPrice: amount.toString(),
       },
       customer_email: formData.email,

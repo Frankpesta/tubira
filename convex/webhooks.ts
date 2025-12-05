@@ -32,9 +32,11 @@ export const handleStripeWebhookInternal = internalMutation({
         const affiliateId = await ctx.db.insert("affiliates", {
           email: metadata.email,
           name: metadata.name,
-          phone: metadata.phone || undefined,
+          phone: metadata.phone || "",
           company: metadata.company || undefined,
           website: metadata.website || undefined,
+          country: metadata.country || "",
+          address: metadata.address || "",
           plan: metadata.plan === "premium" ? "premium" : "standard",
           planPrice: parseInt(metadata.planPrice || "0"),
           status: "paid", // Set to paid immediately since payment succeeded
