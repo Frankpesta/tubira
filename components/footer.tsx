@@ -86,11 +86,11 @@ export function Footer() {
           <p className="text-gray-400 text-sm">
             © {new Date().getFullYear()} Tubira. All rights reserved.
           </p>
-          <div className="flex space-x-6 mt-4 md:mt-0">
+          {/* <div className="flex space-x-6 mt-4 md:mt-0">
             <Link href="/admin/login" className="text-gray-400 hover:text-white text-sm transition-colors">
               Admin
             </Link>
-          </div>
+          </div> */}
         </div>
       </div>
     </footer>
