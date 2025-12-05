@@ -32,7 +32,7 @@ export function Navbar() {
           <Link href="/" className="flex items-center space-x-2">
             {/* Mobile Logo */}
             <Image
-              src="/logo-mobile.jpg"
+              src="/logo-full.jpg"
               alt="Tubira"
               width={120}
               height={40}
