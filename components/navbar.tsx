@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
 
@@ -30,24 +29,9 @@ export function Navbar() {
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-2">
-            {/* Mobile Logo */}
-            <Image
-              src="/logo-full.jpg"
-              alt="Tubira"
-              width={120}
-              height={40}
-              className="md:hidden h-10 w-auto"
-              priority
-            />
-            {/* Desktop Logo */}
-            <Image
-              src="/logo-full.jpg"
-              alt="Tubira"
-              width={150}
-              height={50}
-              className="hidden md:block h-12 w-auto"
-              priority
-            />
+            <div className="text-2xl font-bold bg-linear-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              Tubira
+            </div>
           </Link>
 
           {/* Desktop Menu */}
