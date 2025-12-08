@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { Mail, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -11,8 +12,14 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Brand */}
           <div className="col-span-1 md:col-span-2">
-            <div className="text-3xl font-bold bg-linear-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent mb-4">
-              Tubira
+            <div className="mb-4">
+              <Image
+                src="/logo-full.png"
+                alt="Tubira Logo"
+                width={150}
+                height={50}
+                className="h-12 w-auto object-contain"
+              />
             </div>
             <p className="text-gray-400 mb-4 max-w-md">
               Empowering travelers worldwide with seamless, secure, and flexible booking experiences while providing our partners with a transparent and profitable affiliate platform.
