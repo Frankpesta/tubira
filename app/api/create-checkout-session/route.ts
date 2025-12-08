@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
 
     // Create Stripe Checkout Session with form data in metadata
     const session = await stripe.checkout.sessions.create({
-      payment_method_types: ["card", 'link', 'affirm'],
+      payment_method_types: ["card"],
       line_items: [
         {
           price_data: {
