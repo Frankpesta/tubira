@@ -63,9 +63,7 @@ A comprehensive affiliate management system built with Next.js 16+, Convex, Stri
 
 ## Admin Setup
 
-1. Navigate to `/admin/signup` to create the first admin account
-2. After creating the account, you can remove the signup page or restrict access
-3. Login at `/admin/login`
+1. Login at `/admin/login`
 
 ## Project Structure
 
