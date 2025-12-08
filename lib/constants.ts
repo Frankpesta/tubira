@@ -22,7 +22,6 @@ export const PLANS = {
     price: 100000, // $1,000 in cents
     priceDisplay: "$1,000",
     features: [
-      "Everything in Standard",
       "Activities",
       "Resorts",
       "Cruises",

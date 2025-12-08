@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { stripe } from "@/lib/stripe";
-import { PLANS, TUBIRA_URL } from "@/lib/constants";
+import { PLANS } from "@/lib/constants";
 import { ConvexHttpClient } from "convex/browser";
 import { api } from "@/convex/_generated/api";
 
@@ -28,11 +28,11 @@ export async function POST(request: NextRequest) {
     const planDetails = PLANS[plan as keyof typeof PLANS];
     const amount = planDetails.price;
 
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+    const baseUrl = 'https://affiliates.tubira.ai';
 
     // Create Stripe Checkout Session with form data in metadata
     const session = await stripe.checkout.sessions.create({
-      payment_method_types: ["card"],
+      payment_method_types: ["card","us_bank_account", "sepa_debit", "au_becs_debit", 'alipay', 'wechat_pay', 'bancontact', 'bacs_debit', 'eps', 'giropay', 'ideal', 'p24', 'sepa_debit', 'sofort'],
       line_items: [
         {
           price_data: {
