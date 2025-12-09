@@ -11,43 +11,48 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { toast } from "sonner";
 import Link from "next/link";
 
-export default function AdminLoginPage() {
+export default function AdminSignupPage() {
   const router = useRouter();
-  const login = useAction(api.authActions.login);
+  const createAdmin = useAction(api.authActions.createAdmin);
   const [formData, setFormData] = useState({
+    name: "",
     email: "",
     password: "",
+    confirmPassword: "",
   });
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Validate passwords match
+    if (formData.password !== formData.confirmPassword) {
+      toast.error("Passwords do not match");
+      return;
+    }
+
+    // Validate password strength
+    if (formData.password.length < 8) {
+      toast.error("Password must be at least 8 characters long");
+      return;
+    }
+
     setIsLoading(true);
 
     try {
-      const result = await login({
+      await createAdmin({
+        name: formData.name,
         email: formData.email,
         password: formData.password,
       });
 
-      if (!result || !result.token) {
-        throw new Error("Invalid response from server");
-      }
-
-      // Store token in localStorage
-      localStorage.setItem("admin_token", result.token);
-      localStorage.setItem("admin_data", JSON.stringify(result.admin));
-
-      // Also set cookie for server-side access
-      document.cookie = `admin_token=${result.token}; path=/; max-age=${7 * 24 * 60 * 60}; SameSite=Lax`;
-
-      toast.success("Login successful!");
+      toast.success("Admin account created successfully! Please login.");
       
-      // Use router.push for client-side navigation
-      router.push("/admin/dashboard");
+      // Redirect to login page
+      router.push("/admin/login");
     } catch (error) {
-      console.error("Login error:", error);
-      toast.error(error instanceof Error ? error.message : "Login failed");
+      console.error("Signup error:", error);
+      toast.error(error instanceof Error ? error.message : "Failed to create admin account");
       setIsLoading(false);
     }
   };
@@ -57,14 +62,29 @@ export default function AdminLoginPage() {
       <Card className="w-full max-w-md border-0 shadow-2xl">
         <CardHeader className="bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-t-lg">
           <CardTitle className="text-3xl text-center" style={{ fontFamily: 'var(--font-manrope), sans-serif' }}>
-            Admin Login
+            Admin Signup
           </CardTitle>
           <CardDescription className="text-center text-white/90" style={{ fontFamily: 'var(--font-manrope), sans-serif' }}>
-            Sign in to access the admin dashboard
+            Create a new admin account
           </CardDescription>
         </CardHeader>
         <CardContent className="pt-6">
           <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="space-y-2">
+              <Label htmlFor="name" className="text-sm font-semibold" style={{ fontFamily: 'var(--font-manrope), sans-serif' }}>
+                Full Name
+              </Label>
+              <Input
+                id="name"
+                type="text"
+                required
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                placeholder="John Doe"
+                className="h-12 rounded-lg border-2 focus:border-blue-500"
+              />
+            </div>
+
             <div className="space-y-2">
               <Label htmlFor="email" className="text-sm font-semibold" style={{ fontFamily: 'var(--font-manrope), sans-serif' }}>
                 Email Address
@@ -90,18 +110,26 @@ export default function AdminLoginPage() {
                 required
                 value={formData.password}
                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                placeholder="Enter your password"
+                placeholder="Enter your password (min. 8 characters)"
                 className="h-12 rounded-lg border-2 focus:border-blue-500"
+                minLength={8}
               />
             </div>
 
-            <div className="flex justify-between items-center">
-              <a
-                href="/admin/forgot-password"
-                className="text-sm text-primary hover:underline font-medium" style={{ fontFamily: 'var(--font-manrope), sans-serif' }}
-              >
-                Forgot password?
-              </a>
+            <div className="space-y-2">
+              <Label htmlFor="confirmPassword" className="text-sm font-semibold" style={{ fontFamily: 'var(--font-manrope), sans-serif' }}>
+                Confirm Password
+              </Label>
+              <Input
+                id="confirmPassword"
+                type="password"
+                required
+                value={formData.confirmPassword}
+                onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+                placeholder="Confirm your password"
+                className="h-12 rounded-lg border-2 focus:border-blue-500"
+                minLength={8}
+              />
             </div>
 
             <Button 
@@ -111,18 +139,18 @@ export default function AdminLoginPage() {
               disabled={isLoading}
               style={{ fontFamily: 'var(--font-manrope), sans-serif' }}
             >
-              {isLoading ? "Logging in..." : "Login"}
+              {isLoading ? "Creating account..." : "Create Admin Account"}
             </Button>
 
             <div className="text-center">
               <p className="text-sm text-gray-600" style={{ fontFamily: 'var(--font-manrope), sans-serif' }}>
-                Don&apos;t have an account?{" "}
+                Already have an account?{" "}
                 <Link
-                  href="/admin/signup"
+                  href="/admin/login"
                   className="text-primary hover:underline font-medium"
                   style={{ fontFamily: 'var(--font-manrope), sans-serif' }}
                 >
-                  Sign up here
+                  Login here
                 </Link>
               </p>
             </div>
@@ -132,4 +160,3 @@ export default function AdminLoginPage() {
     </div>
   );
 }
-

@@ -9,6 +9,7 @@ export async function proxy(request: NextRequest) {
 
   // Protect admin routes (excluding auth pages)
   const isAuthPage = pathname.startsWith("/admin/login") || 
+                     pathname.startsWith("/admin/signup") ||
                      pathname.startsWith("/admin/forgot-password") || 
                      pathname.startsWith("/admin/reset-password");
 
