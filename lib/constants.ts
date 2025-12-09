@@ -1,8 +1,9 @@
 export const PLANS = {
   standard: {
     name: "Standard Plan",
-    price: 50000, // $500 in cents
+    price: 50000, // $500 in cents (annual)
     priceDisplay: "$500",
+    billingPeriod: "year",
     features: [
       "Hotels",
       "Car Rentals",
@@ -19,8 +20,9 @@ export const PLANS = {
   },
   premium: {
     name: "Premium Plan",
-    price: 100000, // $1,000 in cents
+    price: 100000, // $1,000 in cents (annual)
     priceDisplay: "$1,000",
+    billingPeriod: "year",
     features: [
       "Activities",
       "Resorts",

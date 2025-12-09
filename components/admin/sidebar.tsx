@@ -10,6 +10,7 @@ import {
   Activity, 
   LogOut,
   X,
+  Tag,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -33,6 +34,11 @@ const menuItems = [
     title: "Activities",
     href: "/admin/activities",
     icon: Activity,
+  },
+  {
+    title: "Coupons",
+    href: "/admin/coupons",
+    icon: Tag,
   },
 ];
 

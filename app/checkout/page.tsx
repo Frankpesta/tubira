@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, Suspense } from "react";
+import { useEffect, Suspense, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { PLANS } from "@/lib/constants";
 import { toast } from "sonner";
@@ -10,6 +10,10 @@ function CheckoutContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const plan = (searchParams.get("plan") as "standard" | "standard" | "premium") || "standard";
+  const [formData, setFormData] = useState<{
+    couponCode?: string | null;
+    discountPercentage?: number;
+  } | null>(null);
 
   useEffect(() => {
     // Get form data from sessionStorage
@@ -20,7 +24,11 @@ function CheckoutContent() {
       return;
     }
 
-    const formData = JSON.parse(formDataStr);
+    const parsedFormData = JSON.parse(formDataStr);
+    setFormData({
+      couponCode: parsedFormData.couponCode || null,
+      discountPercentage: parsedFormData.discountPercentage || 0,
+    });
 
     const createCheckoutSession = async () => {
       try {
@@ -32,14 +40,15 @@ function CheckoutContent() {
           body: JSON.stringify({ 
             plan,
             formData: {
-              name: formData.name,
-              email: formData.email,
-              phone: formData.phone,
-              company: formData.company,
-              website: formData.website,
-              country: formData.country,
-              address: formData.address,
-            }
+              name: parsedFormData.name,
+              email: parsedFormData.email,
+              phone: parsedFormData.phone,
+              company: parsedFormData.company,
+              website: parsedFormData.website,
+              country: parsedFormData.country,
+              address: parsedFormData.address,
+            },
+            couponCode: parsedFormData.couponCode || null,
           }),
         });
 
@@ -71,7 +80,7 @@ function CheckoutContent() {
   const planDetails = PLANS[plan];
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white py-12 px-4">
+    <div className="min-h-screen bg-linear-to-b from-blue-50 to-white py-12 px-4">
       <div className="container mx-auto max-w-2xl">
         <Card>
           <CardHeader>
@@ -79,7 +88,12 @@ function CheckoutContent() {
               Redirecting to Checkout...
             </CardTitle>
             <CardDescription className="text-center" style={{ fontFamily: 'var(--font-manrope), sans-serif' }}>
-              {planDetails.name} - {planDetails.priceDisplay}
+              {planDetails.name} - {planDetails.priceDisplay}/year
+              {formData?.couponCode && formData?.discountPercentage && formData.discountPercentage > 0 && (
+                <span className="block text-green-600 mt-1">
+                  {formData.discountPercentage}% discount applied
+                </span>
+              )}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -99,7 +113,7 @@ function CheckoutContent() {
 export default function CheckoutPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white py-12 px-4">
+      <div className="min-h-screen bg-linear-to-b from-blue-50 to-white py-12 px-4">
         <div className="container mx-auto max-w-2xl">
           <Card>
             <CardHeader>

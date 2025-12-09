@@ -12,6 +12,7 @@ import type * as activities from "../activities.js";
 import type * as affiliates from "../affiliates.js";
 import type * as auth from "../auth.js";
 import type * as authActions from "../authActions.js";
+import type * as coupons from "../coupons.js";
 import type * as payments from "../payments.js";
 import type * as webhooks from "../webhooks.js";
 
@@ -26,6 +27,7 @@ declare const fullApi: ApiFromModules<{
   affiliates: typeof affiliates;
   auth: typeof auth;
   authActions: typeof authActions;
+  coupons: typeof coupons;
   payments: typeof payments;
   webhooks: typeof webhooks;
 }>;

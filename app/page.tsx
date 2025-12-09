@@ -353,7 +353,7 @@ export default function Home() {
                     </div>
                   </div>
                   <p className="text-xs text-gray-500 mb-2 font-semibold" style={{ fontFamily: 'var(--font-manrope), sans-serif' }}>
-                    One-time payment
+                    Annual subscription
                   </p>
                   <CardDescription className="text-base mb-4" style={{ fontFamily: 'var(--font-manrope), sans-serif' }}>
                     Ideal for creators and small agencies starting their affiliate journey
@@ -407,7 +407,7 @@ export default function Home() {
                     </div>
                   </div>
                   <p className="text-xs text-gray-500 mb-2 font-semibold" style={{ fontFamily: 'var(--font-manrope), sans-serif' }}>
-                    One-time payment
+                    Annual subscription
                   </p>
                   <CardDescription className="text-sm sm:text-base mb-4" style={{ fontFamily: 'var(--font-manrope), sans-serif' }}>
                     Perfect for high-volume affiliates who want access to all travel products

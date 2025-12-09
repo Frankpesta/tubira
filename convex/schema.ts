@@ -92,5 +92,18 @@ export default defineSchema({
     .index("by_affiliate", ["affiliateId"])
     .index("by_type", ["type"])
     .index("by_created", ["createdAt"]),
+
+  coupons: defineTable({
+    code: v.string(),
+    discountPercentage: v.number(), // 0-100
+    isActive: v.boolean(),
+    usageCount: v.number(),
+    maxUsage: v.optional(v.number()), // Optional limit on usage
+    expiresAt: v.optional(v.number()), // Optional expiration timestamp
+    createdAt: v.number(),
+    createdBy: v.id("admins"),
+  })
+    .index("by_code", ["code"])
+    .index("by_active", ["isActive"]),
 });
 

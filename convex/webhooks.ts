@@ -11,12 +11,17 @@ export const handleStripeWebhookInternal = internalMutation({
   handler: async (ctx, args) => {
     const { type, data } = args;
 
-    // Handle Checkout Session Completed (for Checkout Sessions)
+    // Handle Checkout Session Completed (for subscriptions)
     if (type === "checkout.session.completed") {
       const session = data.object;
       const checkoutSessionId = session.id;
       const paymentIntentId = session.payment_intent as string | null;
+      const subscriptionId = session.subscription as string | null;
       const metadata = session.metadata || {};
+      const subscriptionMetadata = session.subscription_data?.metadata || {};
+
+      // Use subscription metadata if available, otherwise fall back to session metadata
+      const finalMetadata = { ...metadata, ...subscriptionMetadata };
 
       // Check if affiliate already exists (for backward compatibility)
       let affiliate = await ctx.db
@@ -27,18 +32,21 @@ export const handleStripeWebhookInternal = internalMutation({
         .first();
 
       // If affiliate doesn't exist, create it from metadata (new flow)
-      if (!affiliate && metadata.email && metadata.name) {
+      if (!affiliate && finalMetadata.email && finalMetadata.name) {
         const now = Date.now();
+        // Use finalPrice if available (with discount), otherwise use planPrice
+        const planPrice = parseInt(finalMetadata.finalPrice || finalMetadata.planPrice || "0");
+        
         const affiliateId = await ctx.db.insert("affiliates", {
-          email: metadata.email,
-          name: metadata.name,
-          phone: metadata.phone || "",
-          company: metadata.company || undefined,
-          website: metadata.website || undefined,
-          country: metadata.country || "",
-          address: metadata.address || "",
-          plan: metadata.plan === "premium" ? "premium" : "standard",
-          planPrice: parseInt(metadata.planPrice || "0"),
+          email: finalMetadata.email,
+          name: finalMetadata.name,
+          phone: finalMetadata.phone || "",
+          company: finalMetadata.company || undefined,
+          website: finalMetadata.website || undefined,
+          country: finalMetadata.country || "",
+          address: finalMetadata.address || "",
+          plan: finalMetadata.plan === "premium" ? "premium" : "standard",
+          planPrice: planPrice,
           status: "paid", // Set to paid immediately since payment succeeded
           stripeCheckoutSessionId: checkoutSessionId,
           stripePaymentIntentId: paymentIntentId || undefined,
@@ -53,7 +61,7 @@ export const handleStripeWebhookInternal = internalMutation({
         await ctx.db.insert("activities", {
           affiliateId,
           type: "signup",
-          description: `New affiliate signup: ${metadata.name} (${metadata.email})`,
+          description: `New affiliate signup: ${finalMetadata.name} (${finalMetadata.email})${finalMetadata.couponCode ? ` with coupon ${finalMetadata.couponCode}` : ""}`,
           createdAt: now,
         });
       }
@@ -88,12 +96,69 @@ export const handleStripeWebhookInternal = internalMutation({
         }
 
         // Create activity log for payment
+        const amountPaid = session.amount_total || session.amount_subtotal || 0;
+        const discountInfo = finalMetadata.couponCode && finalMetadata.discountPercentage
+          ? ` (${finalMetadata.discountPercentage}% discount with ${finalMetadata.couponCode})`
+          : "";
+        
         await ctx.db.insert("activities", {
           affiliateId: affiliate._id,
           type: "payment",
-          description: `Payment confirmed: $${(session.amount_total / 100).toFixed(2)}`,
-          amount: session.amount_total,
+          description: `Annual subscription payment confirmed: $${(amountPaid / 100).toFixed(2)}${discountInfo}`,
+          amount: amountPaid,
           createdAt: Date.now(),
+        });
+      }
+    }
+    // Handle subscription events
+    else if (type === "customer.subscription.created" || type === "customer.subscription.updated") {
+      const subscription = data.object;
+      const customerId = subscription.customer as string;
+      const metadata = subscription.metadata || {};
+
+      // Find affiliate by customer ID
+      const affiliate = await ctx.db
+        .query("affiliates")
+        .withIndex("by_stripe_checkout_session", (q) =>
+          q.eq("stripeCustomerId", customerId)
+        )
+        .first();
+
+      if (affiliate && metadata.email) {
+        // Update affiliate with subscription info if needed
+        await ctx.db.patch(affiliate._id, {
+          updatedAt: Date.now(),
+        });
+      }
+    }
+    // Handle invoice payment succeeded (for recurring subscription payments)
+    else if (type === "invoice.payment_succeeded") {
+      const invoice = data.object;
+      const subscriptionId = invoice.subscription as string | null;
+      const customerId = invoice.customer as string;
+      const amountPaid = invoice.amount_paid;
+
+      // Find affiliate by customer ID
+      const affiliate = await ctx.db
+        .query("affiliates")
+        .withIndex("by_stripe_checkout_session", (q) =>
+          q.eq("stripeCustomerId", customerId)
+        )
+        .first();
+
+      if (affiliate) {
+        // Create activity log for recurring payment
+        await ctx.db.insert("activities", {
+          affiliateId: affiliate._id,
+          type: "payment",
+          description: `Annual subscription renewal: $${(amountPaid / 100).toFixed(2)}`,
+          amount: amountPaid,
+          createdAt: Date.now(),
+        });
+
+        // Update affiliate updatedAt
+        await ctx.db.patch(affiliate._id, {
+          updatedAt: Date.now(),
         });
       }
     }
