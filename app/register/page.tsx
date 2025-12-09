@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Suspense } from "react";
 import { useMutation } from "convex/react";
@@ -42,8 +42,11 @@ function RegisterContent() {
   const [isValidatingCoupon, setIsValidatingCoupon] = useState(false);
   const [couponError, setCouponError] = useState<string | null>(null);
 
+  // Debounce timer ref
+  const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
+
   const validateCoupon = async (code: string) => {
-    if (!code.trim()) {
+    if (!code.trim() || code.trim().length < 3) {
       setCouponDiscount(null);
       setCouponError(null);
       return;
@@ -70,12 +73,11 @@ function RegisterContent() {
       } else {
         setCouponDiscount(null);
         setCouponError(data.error || "Invalid coupon code");
-        toast.error(data.error || "Invalid coupon code");
+        // Don't show toast error on every keystroke, only on explicit validation
       }
     } catch (error) {
       setCouponDiscount(null);
       setCouponError("Failed to validate coupon");
-      toast.error("Failed to validate coupon");
     } finally {
       setIsValidatingCoupon(false);
     }
@@ -83,17 +85,34 @@ function RegisterContent() {
 
   const handleCouponCodeChange = (value: string) => {
     setCouponCode(value);
-    if (value.trim()) {
-      // Debounce validation
-      const timeoutId = setTimeout(() => {
-        validateCoupon(value);
-      }, 500);
-      return () => clearTimeout(timeoutId);
-    } else {
+    
+    // Clear previous timer
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current);
+    }
+
+    // Reset discount/error if input is too short
+    if (!value.trim() || value.trim().length < 3) {
       setCouponDiscount(null);
       setCouponError(null);
+      setIsValidatingCoupon(false);
+      return;
     }
+
+    // Set new debounce timer - only validate after 500ms of no typing and at least 3 characters
+    debounceTimerRef.current = setTimeout(() => {
+      validateCoupon(value);
+    }, 500);
   };
+
+  // Cleanup timer on unmount
+  useEffect(() => {
+    return () => {
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
+      }
+    };
+  }, []);
 
   const calculatePrice = () => {
     const basePrice = PLANS[selectedPlan].price;
@@ -103,8 +122,11 @@ function RegisterContent() {
     return basePrice;
   };
 
-  const formatPrice = (cents: number) => {
-    return `$${(cents / 100).toFixed(2)}`;
+  const formatPriceDisplay = (cents: number) => {
+    const amount = (cents / 100).toFixed(2);
+    // Add comma separators for thousands
+    const formatted = amount.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    return `${formatted} USD`;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -350,7 +372,7 @@ function RegisterContent() {
                           ? (
                             <>
                               <span className="line-through text-white/70 mr-2">{PLANS[selectedPlan].priceDisplay}</span>
-                              {formatPrice(calculatePrice())}
+                              {formatPriceDisplay(calculatePrice())}
                             </>
                           )
                           : PLANS[selectedPlan].priceDisplay
@@ -381,9 +403,27 @@ function RegisterContent() {
                   <h3 className="text-2xl font-bold text-white mb-1" style={{ fontFamily: 'var(--font-manrope), sans-serif' }}>
                     {PLANS[selectedPlan].name}
                   </h3>
-                  <p className="text-3xl font-bold text-white" style={{ fontFamily: 'var(--font-manrope), sans-serif' }}>
-                    {PLANS[selectedPlan].priceDisplay}
-                  </p>
+                  <div className="flex items-baseline gap-2">
+                    {useCoupon && couponDiscount !== null && !couponError ? (
+                      <>
+                        <p className="text-2xl font-bold text-white/70 line-through" style={{ fontFamily: 'var(--font-manrope), sans-serif' }}>
+                          {PLANS[selectedPlan].priceDisplay}
+                        </p>
+                        <p className="text-3xl font-bold text-white" style={{ fontFamily: 'var(--font-manrope), sans-serif' }}>
+                          {formatPriceDisplay(calculatePrice())}
+                        </p>
+                      </>
+                    ) : (
+                      <p className="text-3xl font-bold text-white" style={{ fontFamily: 'var(--font-manrope), sans-serif' }}>
+                        {PLANS[selectedPlan].priceDisplay}
+                      </p>
+                    )}
+                  </div>
+                  {useCoupon && couponDiscount !== null && !couponError && (
+                    <p className="text-xs text-green-300 font-semibold mt-1" style={{ fontFamily: 'var(--font-manrope), sans-serif' }}>
+                      {couponDiscount}% discount applied!
+                    </p>
+                  )}
                   <p className="text-xs text-white/80 font-semibold mt-1" style={{ fontFamily: 'var(--font-manrope), sans-serif' }}>
                     Annual subscription
                   </p>
@@ -436,8 +476,15 @@ function RegisterContent() {
                   Standard
                 </div>
                 <div className="text-lg font-bold text-gray-900" style={{ fontFamily: 'var(--font-manrope), sans-serif' }}>
-                  {PLANS.standard.priceDisplay}
+                  {selectedPlan === "standard" && useCoupon && couponDiscount !== null && !couponError
+                    ? formatPriceDisplay(calculatePrice())
+                    : PLANS.standard.priceDisplay}
                 </div>
+                {selectedPlan === "standard" && useCoupon && couponDiscount !== null && !couponError && (
+                  <div className="text-xs text-green-600 font-semibold" style={{ fontFamily: 'var(--font-manrope), sans-serif' }}>
+                    {couponDiscount}% off
+                  </div>
+                )}
                 <div className="text-xs text-gray-500 font-semibold" style={{ fontFamily: 'var(--font-manrope), sans-serif' }}>
                   Annual
                 </div>
@@ -459,8 +506,15 @@ function RegisterContent() {
                   Premium
                 </div>
                 <div className="text-lg font-bold text-gray-900" style={{ fontFamily: 'var(--font-manrope), sans-serif' }}>
-                  {PLANS.premium.priceDisplay}
+                  {selectedPlan === "premium" && useCoupon && couponDiscount !== null && !couponError
+                    ? formatPriceDisplay(calculatePrice())
+                    : PLANS.premium.priceDisplay}
                 </div>
+                {selectedPlan === "premium" && useCoupon && couponDiscount !== null && !couponError && (
+                  <div className="text-xs text-green-600 font-semibold" style={{ fontFamily: 'var(--font-manrope), sans-serif' }}>
+                    {couponDiscount}% off
+                  </div>
+                )}
                 <div className="text-xs text-gray-500 font-semibold" style={{ fontFamily: 'var(--font-manrope), sans-serif' }}>
                   Annual
                 </div>
