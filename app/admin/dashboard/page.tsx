@@ -148,36 +148,34 @@ export default function AdminDashboard() {
                 {affiliates && affiliates.length > 0 ? (
                   <div className="space-y-2 lg:space-y-3">
                     {affiliates.slice(0, 5).map((affiliate: Doc<"affiliates">) => (
-                    <div
-                      key={affiliate._id}
-                      className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4 p-3 lg:p-4 border-2 rounded-lg hover:shadow-md transition-shadow bg-white"
-                    >
-                      <div className="flex-1">
-                        <p className="font-semibold text-gray-900 text-sm lg:text-base" style={{ fontFamily: 'var(--font-manrope), sans-serif' }}>
-                          {affiliate.name}
-                        </p>
-                        <p className="text-xs lg:text-sm text-gray-600 break-all" style={{ fontFamily: 'var(--font-manrope), sans-serif' }}>
-                          {affiliate.email}
-                        </p>
+                      <div
+                        key={affiliate._id}
+                        className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4 p-3 lg:p-4 border-2 rounded-lg hover:shadow-md transition-shadow bg-white"
+                      >
+                        <div className="flex-1">
+                          <p className="font-semibold text-gray-900 text-sm lg:text-base" style={{ fontFamily: 'var(--font-manrope), sans-serif' }}>
+                            {affiliate.name}
+                          </p>
+                          <p className="text-xs lg:text-sm text-gray-600 break-all" style={{ fontFamily: 'var(--font-manrope), sans-serif' }}>
+                            {affiliate.email}
+                          </p>
+                        </div>
+                        <div className="flex items-center justify-between sm:justify-end gap-2 sm:flex-col sm:items-end">
+                          <p className="font-semibold capitalize text-gray-900 text-sm lg:text-base" style={{ fontFamily: 'var(--font-manrope), sans-serif' }}>
+                            {affiliate.plan}
+                          </p>
+                          <p className={`text-xs capitalize px-2 py-1 rounded-full inline-block ${
+                            affiliate.status === "paid" ? "bg-green-100 text-green-800" :
+                            affiliate.status === "pending" ? "bg-yellow-100 text-yellow-800" :
+                            affiliate.status === "active" ? "bg-blue-100 text-blue-800" :
+                            "bg-red-100 text-red-800"
+                          }`} style={{ fontFamily: 'var(--font-manrope), sans-serif' }}>
+                            {affiliate.status}
+                          </p>
+                        </div>
                       </div>
-                      <div className="flex items-center justify-between sm:justify-end gap-2 sm:flex-col sm:items-end">
-                        <p className="font-semibold capitalize text-gray-900 text-sm lg:text-base" style={{ fontFamily: 'var(--font-manrope), sans-serif' }}>
-                          {affiliate.plan}
-                        </p>
-                        <p className={`text-xs capitalize px-2 py-1 rounded-full inline-block ${
-                          affiliate.status === "paid" ? "bg-green-100 text-green-800" :
-                          affiliate.status === "pending" ? "bg-yellow-100 text-yellow-800" :
-                          affiliate.status === "active" ? "bg-blue-100 text-blue-800" :
-                          "bg-red-100 text-red-800"
-                        }`} style={{ fontFamily: 'var(--font-manrope), sans-serif' }}>
-                          {affiliate.status}
-                        </p>
-                      </div>
-                    </div>
-                  ))}
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
                 ) : (
                   <p className="text-center text-gray-500 py-8" style={{ fontFamily: 'var(--font-manrope), sans-serif' }}>
                     No affiliates yet
