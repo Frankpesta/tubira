@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Doc } from "@/convex/_generated/dataModel";
@@ -14,13 +15,48 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { format } from "date-fns";
-import { Download } from "lucide-react";
+import { Download, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
 export default function PaymentsPage() {
+  const [token] = useState<string | null>(() => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("admin_token");
+    }
+    return null;
+  });
+
+  const admin = useQuery(
+    api.auth.verifySession,
+    token ? { token } : "skip"
+  );
+
+  const adminRole = admin?.role || "b2b_agent"; // Default to b2b_agent if role is missing
+
   const payments = useQuery(api.payments.getAll);
   const stats = useQuery(api.payments.getStats);
+
+  // Role check: Only financial_agent and super_admin can access
+  if (adminRole && !["financial_agent", "super_admin"].includes(adminRole)) {
+    return (
+      <AdminLayout>
+        <div className="flex items-center justify-center h-96">
+          <Card className="w-full max-w-md">
+            <CardContent className="pt-6 text-center">
+              <Shield className="h-12 w-12 text-red-500 mx-auto mb-4" />
+              <h2 className="text-xl font-bold mb-2" style={{ fontFamily: 'var(--font-manrope), sans-serif' }}>
+                Access Denied
+              </h2>
+              <p className="text-gray-600" style={{ fontFamily: 'var(--font-manrope), sans-serif' }}>
+                Only Financial Agents and Super Admins can view payments.
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+      </AdminLayout>
+    );
+  }
 
   const handleExport = () => {
     if (!payments || payments.length === 0) {
@@ -73,7 +109,7 @@ export default function PaymentsPage() {
           </div>
           <Button 
             onClick={handleExport}
-            className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 rounded-lg shadow-lg w-full sm:w-auto"
+            className="bg-linear-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 rounded-lg shadow-lg w-full sm:w-auto"
             style={{ fontFamily: 'var(--font-manrope), sans-serif' }}
           >
             <Download className="mr-2 h-4 w-4" />
@@ -84,7 +120,7 @@ export default function PaymentsPage() {
         {stats && (
           <div className="grid gap-4 lg:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
             <Card className="border-0 shadow-lg hover:shadow-xl transition-shadow">
-              <CardHeader className="bg-gradient-to-r from-green-50 to-green-100 rounded-t-lg">
+              <CardHeader className="bg-linear-to-r from-green-50 to-green-100 rounded-t-lg">
                 <CardTitle className="text-sm font-semibold" style={{ fontFamily: 'var(--font-manrope), sans-serif' }}>
                   Total Revenue
                 </CardTitle>
@@ -96,7 +132,7 @@ export default function PaymentsPage() {
               </CardContent>
             </Card>
             <Card className="border-0 shadow-lg hover:shadow-xl transition-shadow">
-              <CardHeader className="bg-gradient-to-r from-blue-50 to-blue-100 rounded-t-lg">
+              <CardHeader className="bg-linear-to-r from-blue-50 to-blue-100 rounded-t-lg">
                 <CardTitle className="text-sm font-semibold" style={{ fontFamily: 'var(--font-manrope), sans-serif' }}>
                   Standard Plan Revenue
                 </CardTitle>
@@ -111,7 +147,7 @@ export default function PaymentsPage() {
               </CardContent>
             </Card>
             <Card className="border-0 shadow-lg hover:shadow-xl transition-shadow">
-              <CardHeader className="bg-gradient-to-r from-purple-50 to-pink-100 rounded-t-lg">
+              <CardHeader className="bg-linear-to-r from-purple-50 to-pink-100 rounded-t-lg">
                 <CardTitle className="text-sm font-semibold" style={{ fontFamily: 'var(--font-manrope), sans-serif' }}>
                   Premium Plan Revenue
                 </CardTitle>
@@ -129,7 +165,7 @@ export default function PaymentsPage() {
         )}
 
         <Card className="border-0 shadow-xl">
-          <CardHeader className="bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-t-lg">
+          <CardHeader className="bg-linear-to-r from-blue-600 to-purple-600 text-white rounded-t-lg">
             <CardTitle className="text-lg lg:text-xl" style={{ fontFamily: 'var(--font-manrope), sans-serif' }}>
               All Payments
             </CardTitle>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Doc, Id } from "@/convex/_generated/dataModel";
@@ -19,10 +19,15 @@ import {
 } from "@/components/ui/table";
 import { format } from "date-fns";
 import { toast } from "sonner";
-import { Plus, Trash2, ToggleLeft, ToggleRight } from "lucide-react";
+import { Plus, Trash2, ToggleLeft, ToggleRight, Shield } from "lucide-react";
 
 export default function CouponsPage() {
-  const [token, setToken] = useState<string | null>(null);
+  const [token] = useState<string | null>(() => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("admin_token");
+    }
+    return null;
+  });
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({
     code: "",
@@ -31,21 +36,38 @@ export default function CouponsPage() {
     expiresAt: "",
   });
 
-  // Get admin info for creating coupons
-  useEffect(() => {
-    const adminToken = localStorage.getItem("admin_token");
-    setToken(adminToken);
-  }, []);
-
   const admin = useQuery(
     api.auth.verifySession,
     token ? { token } : "skip"
   );
 
+  const adminRole = admin?.role || "b2b_agent"; // Default to b2b_agent if role is missing
+
   const coupons = useQuery(api.coupons.list);
   const createCoupon = useMutation(api.coupons.create);
   const toggleActive = useMutation(api.coupons.toggleActive);
   const deleteCoupon = useMutation(api.coupons.deleteCoupon);
+
+  // Role check: Only super_admin can access
+  if (adminRole && adminRole !== "super_admin") {
+    return (
+      <AdminLayout>
+        <div className="flex items-center justify-center h-96">
+          <Card className="w-full max-w-md">
+            <CardContent className="pt-6 text-center">
+              <Shield className="h-12 w-12 text-red-500 mx-auto mb-4" />
+              <h2 className="text-xl font-bold mb-2" style={{ fontFamily: 'var(--font-manrope), sans-serif' }}>
+                Access Denied
+              </h2>
+              <p className="text-gray-600" style={{ fontFamily: 'var(--font-manrope), sans-serif' }}>
+                Only super_admin can manage coupons.
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+      </AdminLayout>
+    );
+  }
 
   const handleCreateCoupon = async (e: React.FormEvent) => {
     e.preventDefault();

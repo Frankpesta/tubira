@@ -54,9 +54,19 @@ export default defineSchema({
     email: v.string(),
     passwordHash: v.string(),
     name: v.string(),
+    role: v.optional(
+      v.union(
+        v.literal("super_admin"),
+        v.literal("financial_agent"),
+        v.literal("b2b_agent")
+      )
+    ),
     createdAt: v.number(),
     lastLoginAt: v.optional(v.number()),
-  }).index("by_email", ["email"]),
+    createdBy: v.optional(v.id("admins")), // Who created this admin
+  })
+    .index("by_email", ["email"])
+    .index("by_role", ["role"]),
 
   sessions: defineTable({
     adminId: v.id("admins"),

@@ -70,7 +70,11 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="flex h-screen overflow-hidden bg-gradient-to-br from-gray-50 to-white">
-      <AdminSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+      <AdminSidebar 
+        isOpen={sidebarOpen} 
+        onClose={() => setSidebarOpen(false)} 
+        adminRole={admin?.role || "b2b_agent"}
+      />
       <main className="flex-1 overflow-y-auto bg-gradient-to-br from-gray-50 to-white">
         {/* Mobile menu button */}
         <div className="lg:hidden sticky top-0 z-30 bg-white border-b shadow-sm p-4">

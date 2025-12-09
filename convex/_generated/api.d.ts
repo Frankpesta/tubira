@@ -9,10 +9,12 @@
  */
 
 import type * as activities from "../activities.js";
+import type * as adminManagement from "../adminManagement.js";
 import type * as affiliates from "../affiliates.js";
 import type * as auth from "../auth.js";
 import type * as authActions from "../authActions.js";
 import type * as coupons from "../coupons.js";
+import type * as migrations from "../migrations.js";
 import type * as payments from "../payments.js";
 import type * as webhooks from "../webhooks.js";
 
@@ -24,10 +26,12 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   activities: typeof activities;
+  adminManagement: typeof adminManagement;
   affiliates: typeof affiliates;
   auth: typeof auth;
   authActions: typeof authActions;
   coupons: typeof coupons;
+  migrations: typeof migrations;
   payments: typeof payments;
   webhooks: typeof webhooks;
 }>;

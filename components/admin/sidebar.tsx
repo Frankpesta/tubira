@@ -11,45 +11,62 @@ import {
   LogOut,
   X,
   Tag,
+  Shield,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-const menuItems = [
+const allMenuItems = [
   {
     title: "Dashboard",
     href: "/admin/dashboard",
     icon: LayoutDashboard,
+    roles: ["super_admin", "financial_agent", "b2b_agent"],
   },
   {
     title: "Affiliates",
     href: "/admin/affiliates",
     icon: Users,
+    roles: ["super_admin", "b2b_agent"],
   },
   {
     title: "Payments",
     href: "/admin/payments",
     icon: DollarSign,
+    roles: ["super_admin", "financial_agent"],
   },
   {
     title: "Activities",
     href: "/admin/activities",
     icon: Activity,
+    roles: ["super_admin", "financial_agent", "b2b_agent"],
   },
   {
     title: "Coupons",
     href: "/admin/coupons",
     icon: Tag,
+    roles: ["super_admin"],
+  },
+  {
+    title: "Admins",
+    href: "/admin/admins",
+    icon: Shield,
+    roles: ["super_admin"],
   },
 ];
 
 interface AdminSidebarProps {
   isOpen?: boolean;
   onClose?: () => void;
+  adminRole?: string;
 }
 
-export function AdminSidebar({ isOpen = true, onClose }: AdminSidebarProps) {
+export function AdminSidebar({ isOpen = true, onClose, adminRole }: AdminSidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
+
+  // Filter menu items based on role (default to b2b_agent if role is missing)
+  const effectiveRole = adminRole || "b2b_agent";
+  const menuItems = allMenuItems.filter((item) => item.roles.includes(effectiveRole));
 
   const handleLogout = () => {
     localStorage.removeItem("admin_token");

@@ -15,6 +15,14 @@ export const createAdmin = action({
     email: v.string(),
     password: v.string(),
     name: v.string(),
+    role: v.optional(
+      v.union(
+        v.literal("super_admin"),
+        v.literal("financial_agent"),
+        v.literal("b2b_agent")
+      )
+    ),
+    createdBy: v.optional(v.string()), // Admin ID who created this (for role checking)
   },
   handler: async (ctx, args): Promise<Id<"admins">> => {
     // Check if admin already exists
@@ -26,6 +34,31 @@ export const createAdmin = action({
       throw new Error("Admin with this email already exists");
     }
 
+    // Check if this is the first admin (make them super_admin)
+    const adminCount = await ctx.runQuery(internal.auth.getAdminCount);
+    const isFirstAdmin = adminCount === 0;
+
+    // Determine role
+    let role: "super_admin" | "financial_agent" | "b2b_agent";
+    if (isFirstAdmin) {
+      // First admin is always super_admin
+      role = "super_admin";
+    } else if (args.role) {
+      // If role is provided, verify creator is super_admin
+      if (args.createdBy) {
+        const creator = await ctx.runQuery(internal.auth.getAdminById, {
+          adminId: args.createdBy as any,
+        });
+        if (!creator || creator.role !== "super_admin") {
+          throw new Error("Only super_admin can assign roles");
+        }
+      }
+      role = args.role;
+    } else {
+      // Default to b2b_agent for public signups
+      role = "b2b_agent";
+    }
+
     // Hash password using Node.js
     const passwordHash: string = await bcrypt.hash(args.password, 10);
 
@@ -34,6 +67,8 @@ export const createAdmin = action({
       email: args.email,
       passwordHash,
       name: args.name,
+      role,
+      createdBy: args.createdBy as any,
     });
 
     return adminId;
@@ -81,7 +116,7 @@ export const login = action({
       adminId: admin._id,
     });
 
-    return { token, admin: { id: admin._id, email: admin.email, name: admin.name } };
+    return { token, admin: { id: admin._id, email: admin.email, name: admin.name, role: admin.role } };
   },
 });
 

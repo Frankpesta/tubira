@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Doc } from "@/convex/_generated/dataModel";
@@ -17,11 +18,51 @@ import {
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { format } from "date-fns";
 import { toast } from "sonner";
-import { Download } from "lucide-react";
+import { Download, Shield } from "lucide-react";
 
 export default function AffiliatesPage() {
+  const [token, setToken] = useState<string | null>(() => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("admin_token");
+    }
+    return null;
+  });
+  const [adminRole, setAdminRole] = useState<string | null>(null);
+
+  const admin = useQuery(
+    api.auth.verifySession,
+    token ? { token } : "skip"
+  );
+
+  useEffect(() => {
+    if (admin) {
+      setAdminRole(admin.role || "b2b_agent"); // Default to b2b_agent if role is missing
+    }
+  }, [admin]);
+
   const affiliates = useQuery(api.affiliates.getAll);
   const updateStatus = useMutation(api.affiliates.updateStatus);
+
+  // Role check: Only b2b_agent and super_admin can access
+  if (adminRole && !["b2b_agent", "super_admin"].includes(adminRole)) {
+    return (
+      <AdminLayout>
+        <div className="flex items-center justify-center h-96">
+          <Card className="w-full max-w-md">
+            <CardContent className="pt-6 text-center">
+              <Shield className="h-12 w-12 text-red-500 mx-auto mb-4" />
+              <h2 className="text-xl font-bold mb-2" style={{ fontFamily: 'var(--font-manrope), sans-serif' }}>
+                Access Denied
+              </h2>
+              <p className="text-gray-600" style={{ fontFamily: 'var(--font-manrope), sans-serif' }}>
+                Only B2B Agents and Super Admins can view affiliates.
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+      </AdminLayout>
+    );
+  }
 
   const handleStatusChange = async (
     id: string,

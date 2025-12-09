@@ -7,13 +7,26 @@ export const createAdminInternal = internalMutation({
     email: v.string(),
     passwordHash: v.string(),
     name: v.string(),
+    role: v.optional(
+      v.union(
+        v.literal("super_admin"),
+        v.literal("financial_agent"),
+        v.literal("b2b_agent")
+      )
+    ),
+    createdBy: v.optional(v.id("admins")),
   },
   handler: async (ctx, args) => {
+    // Ensure role is always set (default to b2b_agent if not provided)
+    const role = args.role || "b2b_agent";
+    
     const adminId = await ctx.db.insert("admins", {
       email: args.email,
       passwordHash: args.passwordHash,
       name: args.name,
+      role,
       createdAt: Date.now(),
+      createdBy: args.createdBy,
     });
     return adminId;
   },
@@ -89,6 +102,7 @@ export const verifySession = query({
       id: admin._id,
       email: admin.email,
       name: admin.name,
+      role: admin.role || "b2b_agent", // Default to b2b_agent if role is missing (for backward compatibility)
     };
   },
 });
@@ -151,5 +165,19 @@ export const getPasswordResetTokenInternal = internalQuery({
       .query("passwordResetTokens")
       .withIndex("by_token", (q) => q.eq("token", args.token))
       .first();
+  },
+});
+
+export const getAdminCount = internalQuery({
+  handler: async (ctx) => {
+    const admins = await ctx.db.query("admins").collect();
+    return admins.length;
+  },
+});
+
+export const getAdminById = internalQuery({
+  args: { adminId: v.id("admins") },
+  handler: async (ctx, args) => {
+    return await ctx.db.get(args.adminId);
   },
 });
