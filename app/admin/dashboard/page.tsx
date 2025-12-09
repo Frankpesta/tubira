@@ -25,10 +25,10 @@ export default function AdminDashboard() {
 
   // Role-based data fetching
   const affiliates = useQuery(
-    adminRole === "financial_agent" ? undefined : api.affiliates.getAll
+    adminRole === "financial_agent" ? "skip" : api.affiliates.getAll
   );
   const stats = useQuery(
-    adminRole === "b2b_agent" ? undefined : api.payments.getStats
+    adminRole === "b2b_agent" ? "skip" : api.payments.getStats
   );
 
   const totalAffiliates = affiliates?.length || 0;
