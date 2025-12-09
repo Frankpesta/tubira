@@ -23,12 +23,14 @@ export default function AdminDashboard() {
 
   const adminRole = admin?.role || "b2b_agent"; // Default to b2b_agent if role is missing
 
-  // Role-based data fetching
+  // Role-based data fetching - always fetch but conditionally use
   const affiliates = useQuery(
-    adminRole === "financial_agent" ? "skip" : api.affiliates.getAll
+    api.affiliates.getAll,
+    adminRole === "financial_agent" ? "skip" : {}
   );
   const stats = useQuery(
-    adminRole === "b2b_agent" ? "skip" : api.payments.getStats
+    api.payments.getStats,
+    adminRole === "b2b_agent" ? "skip" : {}
   );
 
   const totalAffiliates = affiliates?.length || 0;
