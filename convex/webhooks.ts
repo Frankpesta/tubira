@@ -119,7 +119,7 @@ export const handleStripeWebhookInternal = internalMutation({
       // Find affiliate by customer ID
       const affiliate = await ctx.db
         .query("affiliates")
-        .withIndex("by_stripe_checkout_session", (q) =>
+        .withIndex("by_stripe_customer", (q) =>
           q.eq("stripeCustomerId", customerId)
         )
         .first();
@@ -141,7 +141,7 @@ export const handleStripeWebhookInternal = internalMutation({
       // Find affiliate by customer ID
       const affiliate = await ctx.db
         .query("affiliates")
-        .withIndex("by_stripe_checkout_session", (q) =>
+        .withIndex("by_stripe_customer", (q) =>
           q.eq("stripeCustomerId", customerId)
         )
         .first();

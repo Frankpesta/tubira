@@ -27,7 +27,8 @@ export default defineSchema({
     .index("by_email", ["email"])
     .index("by_status", ["status"])
     .index("by_stripe_payment_intent", ["stripePaymentIntentId"])
-    .index("by_stripe_checkout_session", ["stripeCheckoutSessionId"]),
+    .index("by_stripe_checkout_session", ["stripeCheckoutSessionId"])
+    .index("by_stripe_customer", ["stripeCustomerId"]),
 
   payments: defineTable({
     affiliateId: v.optional(v.id("affiliates")), // Optional initially, will be set after affiliate creation
