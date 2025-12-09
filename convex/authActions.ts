@@ -81,7 +81,7 @@ export const login = action({
     email: v.string(),
     password: v.string(),
   },
-  handler: async (ctx, args): Promise<{ token: string; admin: { id: string; email: string; name: string } }> => {
+  handler: async (ctx, args): Promise<{ token: string; admin: { id: string; email: string; name: string; role: string } }> => {
     const admin = await ctx.runQuery(internal.auth.getAdminByEmailInternal, {
       email: args.email,
     });
@@ -116,7 +116,7 @@ export const login = action({
       adminId: admin._id,
     });
 
-    return { token, admin: { id: admin._id, email: admin.email, name: admin.name, role: admin.role } };
+    return { token, admin: { id: admin._id, email: admin.email, name: admin.name, role: admin.role || "b2b_agent" } };
   },
 });
 
