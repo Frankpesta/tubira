@@ -21,24 +21,19 @@ import { toast } from "sonner";
 import { Download, Shield } from "lucide-react";
 
 export default function AffiliatesPage() {
-  const [token, setToken] = useState<string | null>(() => {
+  const [token] = useState<string | null>(() => {
     if (typeof window !== "undefined") {
       return localStorage.getItem("admin_token");
     }
     return null;
   });
-  const [adminRole, setAdminRole] = useState<string | null>(null);
 
   const admin = useQuery(
     api.auth.verifySession,
     token ? { token } : "skip"
   );
 
-  useEffect(() => {
-    if (admin) {
-      setAdminRole(admin.role || "b2b_agent"); // Default to b2b_agent if role is missing
-    }
-  }, [admin]);
+  const adminRole = admin?.role || "b2b_agent"; // Default to b2b_agent if role is missing
 
   const affiliates = useQuery(api.affiliates.getAll);
   const updateStatus = useMutation(api.affiliates.updateStatus);
