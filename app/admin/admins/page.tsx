@@ -343,7 +343,7 @@ export default function AdminsPage() {
                       <SelectTrigger className="h-12">
                         <SelectValue />
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent className="bg-white">
                         <SelectItem value="super_admin">Super Admin</SelectItem>
                         <SelectItem value="financial_agent">
                           Financial Agent
@@ -478,7 +478,7 @@ export default function AdminsPage() {
                               <SelectTrigger className="w-40 text-xs">
                                 <SelectValue />
                               </SelectTrigger>
-                              <SelectContent>
+                              <SelectContent className="bg-white">
                                 <SelectItem value="super_admin">
                                   Super Admin
                                 </SelectItem>
