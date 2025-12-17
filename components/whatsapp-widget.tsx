@@ -12,8 +12,9 @@ export function WhatsAppWidget() {
   // Don't show on admin pages
   const isAdminPage = pathname?.startsWith("/admin");
   
-  // Dummy WhatsApp link - replace with actual link later
-  const whatsappLink = "https://wa.me/1234567890?text=Hello%20Tubira%20Affiliate%20Team";
+  const whatsappNumber = "15875748294";
+  const whatsappText = "Hello Tubira Affiliate Team";
+  const whatsappLink = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(whatsappText)}`;
 
   if (isAdminPage) {
     return null;

@@ -2,9 +2,19 @@ import { NextRequest, NextResponse } from "next/server";
 import { stripe } from "@/lib/stripe";
 import { ConvexHttpClient } from "convex/browser";
 import { api } from "@/convex/_generated/api";
+import { Resend } from "resend";
+import { SubscriptionConfirmedAdminEmail } from "@/emails/subscription-confirmed-admin";
 
 const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
+
+function getResend() {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) {
+    throw new Error("RESEND_API_KEY is not set");
+  }
+  return new Resend(apiKey);
+}
 
 export async function POST(request: NextRequest) {
   const body = await request.text();
@@ -61,6 +71,55 @@ export async function POST(request: NextRequest) {
           console.error("Failed to send welcome email:", emailError);
           // Don't fail the webhook if email fails
         }
+      }
+
+      // Notify super_admin + financial_agent that subscription is confirmed
+      try {
+        const admins = await convex.query(api.adminManagement.list, {} as any);
+        const recipients = Array.from(
+          new Set(
+            (admins || [])
+              .filter(
+                (a: any) =>
+                  a?.email &&
+                  (a?.role === "super_admin" || a?.role === "financial_agent")
+              )
+              .map((a: any) => a.email)
+          )
+        );
+
+        if (recipients.length > 0) {
+          const resend = getResend();
+          const affiliateName = session.metadata?.name || "Affiliate";
+          const affiliateEmail = email || "unknown";
+          const planLabel = plan === "standard" ? "Standard Plan" : "Premium Plan";
+          const amountPaid = amount !== null && amount !== undefined ? `$${(amount / 100).toFixed(2)}` : "N/A";
+
+          const from =
+            process.env.RESEND_FROM_EMAIL ||
+            "Tubira Affiliates <no-reply@affiliates.tubira.ai>";
+
+          const { error } = await resend.emails.send({
+            from,
+            to: recipients,
+            subject: `Subscription confirmed: ${affiliateName} (${planLabel})`,
+            react: SubscriptionConfirmedAdminEmail({
+              affiliateName,
+              affiliateEmail,
+              plan: planLabel,
+              amountPaid,
+              checkoutSessionId: session.id,
+              stripeCustomerId: (session.customer as string) || undefined,
+              stripeSubscriptionId: (session.subscription as string) || undefined,
+            }),
+          });
+
+          if (error) {
+            console.error("Failed to send admin subscription notification:", error);
+          }
+        }
+      } catch (notifyError) {
+        console.error("Failed to notify admins about subscription confirmation:", notifyError);
       }
     } else if (event.type === "payment_intent.succeeded") {
       // Backward compatibility for Payment Intents
